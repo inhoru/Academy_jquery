@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>객체탐색</title>
+    <script src="./js/jquery-3.7.0.min.js"></script>
+</head>
+
+<body>
+    <h2>순회탐색하기</h2>
+    <ul>
+        <li>first() : 선택자로 선택된 element중 0인덱스의 element -> : first</li>
+        <li>last() : 선택자로 선택된 element중 마지막인덱스의 element -> :last</li>
+        <li>eq(index) : 선택자로 선택된 element중 매개변수값과 동일한 위치에 있는 element</li>
+        <li>fiter(function(index,value){return true||false}||선택자) : 선택자로 선택된 element중 return값이 true인 element</li>
+        <li>not(선택자) : 매개변수로 선택자를 제외한 element</li>
+    </ul>
+    <div id="container">
+        <h3 class="a">h3 1</h3>
+        <h3>h3 2</h3>
+        <h3 class="a">h3 3</h3>
+        <h3>h3 4</h3>
+        <h4>h4</h4>
+        <p>p1</p>
+        <p class="a">p2</p>
+        <p>p3</p>
+        <p class="a">p4</p>
+    </div>
+    <button onclick="firstTest();">첫번째 element선택</button>
+    <button onclick="lastTest();">마지막 element선택</button>
+    <button onclick="eqTest();">동일한위치 element선택</button>
+    <button onclick="filterTest();">조건에 맞는 element선택</button>
+    <button onclick="notTest();">제외하고 element선택</button>
+
+
+    <script>
+        const firstTest = () => {
+            console.log($("#container>*").first());
+            $("#container>*").first().css("fontSize", "50px");
+        }
+        const lastTest = () => {
+            console.log($("#container>*").last());
+
+        }
+        const eqTest = () => {
+            console.log($("#container>*").eq(4));
+
+        }
+        const filterTest = () => {
+            //선택자필터
+            //$("#container>*").filter("p,h4").css("backgroundColor","lime");
+            //$("#container>*").filter(".a").css("backgroundColor","lime");
+            //함수 필터
+            //인덱스가 짝수인애들만 변경
+            $("#container>*").filter((i, v) => {
+                //인덱스번호의 텍스트를 가져옴 text에
+                const text = $(v).text();
+                //return i%2==0;
+                return text.includes("2") || text.includes("4");
+            }).css("backgroundColor", "lime");
+
+        }
+        const notTest = () => {
+            //클래스가 a인빼고 전부다줌
+            $("#container>*").not(".a,p").css("backgroundColor", "magenta");
+
+        }
+    </script>
+    <h3>자식 Element검색하기</h3>
+    <p>
+        children() : 자식(직접연결된 Element)를 가져오는 함수
+        find("선택자") : 후손중에서 매개변수와 일치하는 element가져오는 함수
+    </p>
+    <div id="childrencontainer">
+        <table>
+            <tr>
+                <td>1</td>
+                <td>2</td>
+                <td>3</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>5</td>
+                <td>6</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td><button>버튼입니다.</button></td>
+                <td><input type="text" name="test"></td>
+            </tr>
+        </table>
+        <button>외부버튼입니다.</button>
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQC3oEyH9UKmCpZ0DhCcMjmNCNcZYycP2OjrJw9DBkmxA&s"
+            alt="" width="100" height="100">
+    </div>
+    <button onclick="searchChildren();">자식찾기</button>
+    <button onclick="searchFind();">후손태그찾기</button>
+    <script>
+        const searchChildren = () => {
+            const children = $("#childrencontainer").children();
+            console.log(children);
+            console.log($("#childrencontainer>table>tbody").children());
+            console.log($("#childrencontainer>table>tbody").children().children());
+            // .each((i,v)=>{
+            //     const td=$(v).children();
+            //     console.log(td);
+            // })
+            $("#childrencontainer>table>tbody").children().first().css({
+                "backgroundColor": "lightgray",
+                "color": "white"
+            });
+            $("#childrencontainer>table>tbody").children().last().css({
+                "backgroundColor": "magenta",
+                "color": "white"
+            });
+        }
+        const searchFind = () => {
+            //특정한태그를 찾고싶다면 find를 사용하면된다. 
+            //선택자도 사용할수있다.
+            console.log($("#childrencontainer").find("tr"));
+            console.log($("#childrencontainer").find("td"));
+            console.log($("#childrencontainer").find("button"));
+            const innerTag = $("#childrencontainer").find("td").children().each((i, v) => {
+                console.log($(v).prop("tagName"));
+                console.log(v.tagName);
+                switch ($(v).prop("tagName")) {
+                    case "BUTTON": $(v).click(e => alert("클릭")); break;
+                    case "INPUT": $(v).val("내가 값을 입력함"); break;
+                }
+            })
+            console.log(innerTag);
+        }
+    </script>
+
+    <h3>부모태그찾기</h3>
+    <p>
+        1. parent() : 바로 위에 있는 부모
+        2. parents() : 모든 부모를 가져오기
+        3. parentsUntil("선택자") : 특정범위의 부모만 가져오기
+    </p>
+    <div id="parentcontainer">
+        <div>div태그 div부모
+            <div>div태그 h1태그부모
+                <h1>1h태그 p태그부모
+                    <p>p태그</p>
+                </h1>
+            </div>
+        </div>
+    </div>
+    <button onclick="parentTest();">부모찾기</button>
+    <button onclick="parentAllTest();">모든부모찾기</button>
+    <button onclick="parentUntilTest();">모든부모찾기</button>
+
+    <script>
+        const parentTest = () => {
+            console.log($("#parentcontainer p").parent());
+            console.log($("#parentcontainer p").parent().parent());
+        }
+        const parentAllTest = () => {
+            //부모님 모셔와~ 전부다~ html까지~
+            console.log($("#parentcontainer p").parents());
+            console.log($("#parentcontainer p").parents().filter(("#parentcontainer")));
+        }
+        const parentUntilTest = () => {
+            console.log($("#parentcontainer p").parentsUntil("div#parentcontainer"));
+        }
+    </script>
+
+    <h3>형제 element찾기 -> 같은 위치에 있는 element찾기</h3>
+    <div id="brocontainer">
+        <h2>1</h2>
+        <h2>2</h2>
+        <p>p 1</p>
+        <p>p 2</p>
+        <p>p 3</p>
+        <span>span 1</span>
+        <span>span 2</span>
+        <ul>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li>4</li>
+        </ul>
+        <div>
+            <h2>div h2 1</h2>
+            <h2>div h2 2</h2>
+            <p>div p 1</p>
+            <span>div span 1</span>
+        </div>
+    </div>
+    <button onclick="siblingsTest();">형제들 가져오기</button>
+    <button onclick="prevTest();">위에있는 element 가져오기</button>
+    <button onclick="prevAllTest();">위에 있는 전체 element 가져오기</button>
+    <button onclick="prevUntilTest();">위에 있는 일부 범위의 element 가져오기</button>
+    <button onclick="nextTest();">밑에있는 element 가져오기</button>
+
+    <script>
+        const nextTest=()=>{
+            const test=$("#brocontainer>p:last").next();
+            console.log(test);
+            const test2=$("#brocontainer>p:last").nextAll();
+            console.log(test2);
+        }
+        const siblingsTest=()=>{
+            //선택된애를 빼고 같은 라인에있는것들 모두가져온다.위에잇거나아래잇거나
+            const bro=$("#brocontainer>ul").siblings();
+            console.log(bro);
+        }
+        const prevTest=()=>{
+            const prevEl=$("#brocontainer>ul").prev();
+            console.log(prevEl);
+            //모든 p들의 위에잇는것들을 가져온다.
+            const prevEl2=$("#brocontainer p").prev();
+            console.log(prevEl2);
+
+        }
+        const prevAllTest=()=>{
+            const prevElAll=$("#brocontainer>ul").prevAll().filter((i,v)=>{
+                return v.tagName=='P'||v.tagName=='SPAN';
+            }).css({
+                "fontSize" :"30",
+                "color" : "red"
+            }).css("display",(i,v)=>{
+                if(v='inline') return "block"
+                return v;
+            });
+            console.log(prevElAll);
+            prevElAll.filter
+        }
+        const prevUntilTest=()=>{
+           const test=$("#brocontainer>ul").prevUntil("#brocontainer>h2:first");
+           console.log(test);
+        }
+    </script>
+
+</body>
+
+</html>
